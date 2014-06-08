@@ -1,0 +1,341 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+    	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+		<title> Dailys </title>
+		
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/style.css" rel="stylesheet">
+		
+	</head>
+	<body class="container">
+		<div class="col-sm-8 col-sm-offset-2">
+			<nav>
+
+				<!-- Nav tabs -->
+				<ul class="nav nav-tabs nav-justified">
+				  <li><a href="#add-task" data-toggle="tab"><h1 class="glyphicon glyphicon-plus-sign" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Add a task."></h1></a></li>
+				  <li><a href="#export-tasks" data-toggle="tab"><h1 class="glyphicon glyphicon-circle-arrow-up" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Export your list."></h1></a></li>
+				  <li><a href="#import-tasks" data-toggle="tab"><h1 class="glyphicon glyphicon-circle-arrow-down" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Import a list."></h1></a></li>
+				  <li><a href="#help" data-toggle="tab"><h1 class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Help."></h1></a></li>
+				  <li class="active"><a href="#close" data-toggle="tab"><h1 class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Close the top panel."></h1></a></li>
+				</ul>
+
+				<!-- Tab panes -->
+				<div class="tab-content">
+				  <div class="tab-pane" id="add-task">
+					<form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label class="col-sm-2 control-label" for="description-input">Description</label>
+							<div class="col-sm-10">
+								<textarea id="description-input" class="form-control" type="text-area" placeholder="Brief description of task."></textarea>
+							</div>
+						</div>
+			
+						<div class="form-group">
+							<label class="col-sm-2 control-label" for="repeat-input">Repeat</label>
+							<div class="col-sm-4">
+								<select id="repeat-input" class="form-control">
+								  <option>Daily</option>
+								  <option>Weekly</option>
+								  <option>Monthly</option>
+								  <option>Yearly</option>
+								  <option>Every...</option>
+								  <option>Never</option>
+								</select>
+							</div>
+							<div class="col-sm-3">
+								<input id="interval-input"class="form-control" type="text" placeholder="Custom Interval"></input>
+							</div>
+							<div class="col-sm-3">
+								<select id="interval-type-input" class="form-control">
+								  <option>Days</option>
+								  <option>Weeks</option>
+								  <option>Months</option>
+								  <option>Years</option>
+								</select>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label id="date-input-label" class="col-sm-2 control-label" for="date-input">Due Date</label>
+							<span id="date-input">
+								<div class="col-sm-3">
+									<button id="date-end-toggle" type="button" class="btn btn-default btn-block" data-toggle="button">Enabled</button>
+								</div>
+								<div class="col-sm-3">
+									<select id="month-input" class="form-control">
+									  <option>January</option>
+									  <option>February</option>
+									  <option>March</option>
+									  <option>April</option>
+									  <option>May</option>
+									  <option>June</option>
+									  <option>July</option>
+									  <option>August</option>
+									  <option>September</option>
+									  <option>October</option>
+									  <option>November</option>
+									  <option>December</option>
+									</select>
+								</div>
+								<div class="col-sm-2">
+									<select id="day-input" class="form-control">
+									  <option>1</option>
+									  <option>2</option>
+									  <option>3</option>
+									  <option>4</option>
+									  <option>5</option>
+									  <option>6</option>
+									  <option>7</option>
+									  <option>8</option>
+									  <option>9</option>
+									  <option>10</option>
+									  <option>11</option>
+									  <option>12</option>
+									  <option>13</option>
+									  <option>14</option>
+									  <option>15</option>
+									  <option>16</option>
+									  <option>17</option>
+									  <option>18</option>
+									  <option>19</option>
+									  <option>20</option>
+									  <option>21</option>
+									  <option>22</option>
+									  <option>23</option>
+									  <option>24</option>
+									  <option>25</option>
+									  <option>26</option>
+									  <option>27</option>
+									  <option>28</option>
+									  <option>29</option>
+									  <option>30</option>
+									  <option>31</option>
+									</select>
+								</div>
+								<div class="col-sm-2">
+									<select id="year-input"  class="form-control">
+									  <option>2014</option>
+									  <option>2015</option>
+									  <option>2016</option>
+									  <option>2017</option>
+									  <option>2018</option>
+									  <option>2019</option>
+									  <option>2020</option>
+									  <option>2021</option>
+									  <option>2022</option>
+									  <option>2023</option>
+									</select>
+								</div>
+							</span>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-sm-2 control-label" for="repeat-type-input">Reset Counter</label>
+							<div class="col-sm-10">
+								<select id="repeat-type-input" class="form-control">
+								  <option>Normally</option>
+								  <option>Only if the task has been completed.</option>
+								</select>
+							</div>
+						</div>
+			
+						<div class="form-group">
+							<label class="col-sm-2 control-label" for="timed-input">Timed</label>
+							<div class="col-sm-2">
+								<button id="timed-toggle" type="button" class="btn btn-default btn-block" data-toggle="button">Timed</button>
+							</div>
+							<div class="col-sm-2">
+								<input id="hours-input" class="form-control" type="text" placeholder="Hours"></input>
+							</div>
+							<div class="col-sm-2 form-text-only text-center">
+								<span id="hours-input-label"><label for="hours-input">hours</label> and</span>
+							</div>
+							<div class="col-sm-2">
+								<input id="minutes-input" class="form-control" type="text" placeholder="Minutes"></input>
+							</div>
+							<div class="col-sm-2 form-text-only text-left">
+								<label id="minutes-input-label" for="minutes-input">minutes</label>
+							</div>
+						</div>	
+			
+						<div class="form-group">
+							<div class="col-sm-12">
+								<button id="add-task-submit" type="submit" class="btn btn-default btn-lg btn-block btn-primary">Add Task</button>
+							</div>
+					  	</div>
+					  	
+					  	<div class="form-group hidden">
+							<div class="col-sm-4">
+								<h2> Are you sure? </h2>
+							</div>
+							<div class="col-sm-4">
+								<button id="add-task-confirm" type="submit" class="btn btn-default btn-lg btn-block btn-success">Submit Anyway</button>
+							</div>
+							<div class="col-sm-4">
+								<button id="add-task-cancel" type="submit" class="btn btn-default btn-lg btn-block btn-danger">Cancel</button>
+							</div>
+					  	</div>
+		  
+					</form>
+				  </div>
+			  
+				  <div class="tab-pane" id="export-tasks">
+					<form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label class="col-sm-2 control-label" for="export-text">Export</label> 
+							<div class="col-sm-10">
+								<p class="help-block">Export your task list into comma seperated format.</p>
+								<textarea id="export-text" class="form-control" type="text-area" placeholder="Copy this text."></textarea>
+							</div>
+						</div>
+			
+			
+						<div class="form-group">
+							<div class="col-sm-offset-1 col-sm-10">
+								<button id="copy-btn" type="submit" class="btn btn-lg btn-block btn-primary">Copy</button>
+							</div>
+					  </div>
+					</form>
+				</div>
+			
+				<div class="tab-pane" id="import-tasks"> 		
+					<form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label class="col-sm-2 control-label" for="import-input">Mass Import</label> 
+							<div class="col-sm-10">
+								<p class="help-block">Import text can be obtained by clicking the <span class="glyphicon glyphicon-circle-arrow-up"></span> export button at the top of the page.</p>
+								<textarea id="import-input" class="form-control" type="text-area" placeholder="Paste import text here."></textarea>
+							</div>
+						</div>
+			
+			
+						<div class="form-group">
+							<div class="col-sm-5 col-sm-offset-1">
+								<button id="add-tasks" type="submit" class="btn btn-default btn-lg btn-block btn-primary">Add Tasks</button>
+							</div>
+							<div class="col-sm-5">
+								<button id="replace-tasks" type="submit" class="btn btn-danger btn-lg btn-block btn-primary">Replace Tasks</button>
+							</div>
+					  </div>
+					</form>
+				  </div>
+				  <div class="tab-pane" id="help">		
+					<div>
+						<ul class="list-unstyled col-sm-12 col-sm-offset-1">
+							<li><h3><span class="glyphicon glyphicon-plus-sign"></span> Add a new task.</h3></li>
+							<li><h3><span class="glyphicon glyphicon-circle-arrow-up"></span> Export tasks as comma separated format. </h3></li>
+							<li><h3><span class="glyphicon glyphicon-circle-arrow-down"></span> Import new tasks from comma separated format. </h3></li>
+							<li><h3><span class="glyphicon glyphicon-question-sign"></span> This help page. </h3></li>
+							<li><h3><span class="glyphicon glyphicon-remove-sign"></span> Close this window. </h3></li>
+						</ul>
+					</div>
+				</div>
+				  <div class="tab-pane active" id="close"><!-- EMPTY --></div>
+				</div>
+
+			</nav>
+		
+			<div class="row">
+				<div class="col-sm-12">
+				<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+				  <!-- Indicators -->
+				  <ol class="carousel-indicators">
+					<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+					<li data-target="#carousel-example-generic" data-slide-to="1"></li>
+					<li data-target="#carousel-example-generic" data-slide-to="2"></li>
+				  </ol>
+
+				  <!-- Wrapper for slides -->
+				  <div class="carousel-inner">
+					<div class="item active">
+					  
+					  <a href="#"><h2 class="glyphicon glyphicon-pause"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Pause."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;
+					  <a href="#"><h2 class="glyphicon glyphicon-stop" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Restart."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;
+					  <a href="#"><h2 class="glyphicon glyphicon-edit"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Edit."></h2></a>
+					  
+					  <h1>My simple task.</h1>
+					  <h2>1 hour and 25 minutes remaining!</h2>
+					  <h2>Repeats daily.</h2>
+					  
+					  <div class="form-group">
+							<div class="col-sm-4">
+								<button id="add-task" type="submit" class="btn btn-success btn-lg btn-block btn-primary">Done!</button>
+							</div>
+							<div class="col-sm-4">
+								<button id="add-task" type="submit" class="btn btn-warning btn-lg btn-block btn-primary">Not today...</button>
+							</div>
+							<div class="col-sm-4">
+								<button id="add-task" type="submit" class="btn btn-danger btn-lg btn-block btn-primary">Delete.</button>
+							</div>
+					  </div>
+					</div>
+					
+					<div class="item">
+					  <a href="#"><h2 class="glyphicon glyphicon-play" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Start."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;
+					  <a href="#"><h2 class="glyphicon glyphicon-stop"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Restart."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;
+					  <a href="#"><h2 class="glyphicon glyphicon-edit"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Edit."></h2></a>
+					
+					  <h1>My simple task.</h1>
+					  <h2>for 1 hour and 15 minutes.</h2>
+					  <h2>Repeats daily.</h2>
+					  
+					  <div class="form-group">
+							<div class="col-sm-4">
+								<button id="add-task" type="submit" class="btn btn-success btn-lg btn-block btn-primary">Done!</button>
+							</div>
+							<div class="col-sm-4">
+								<button id="add-task" type="submit" class="btn btn-warning btn-lg btn-block btn-primary">Not today...</button>
+							</div>
+							<div class="col-sm-4">
+								<button id="add-task" type="submit" class="btn btn-danger btn-lg btn-block btn-primary">Delete.</button>
+							</div>
+					  </div>
+					</div>
+			
+					<div class="item">
+					  <a href="#"><h2 class="glyphicon glyphicon-edit"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Edit."></h2></a>
+					
+					  <h1>My less simple task.</h1>
+					  <h2>Incomplete</h2>
+					  <h2>Due June 1st, 2014.</h2>
+					  
+					  <div class="form-group">
+							<div class="col-sm-4">
+								<button id="add-task" type="submit" class="btn btn-success btn-lg btn-block btn-primary">Done!</button>
+							</div>
+							<div class="col-sm-4">
+								<button id="add-task" type="submit" class="btn btn-warning btn-lg btn-block btn-primary">Not today...</button>
+							</div>
+							<div class="col-sm-4">
+								<button id="add-task" type="submit" class="btn btn-danger btn-lg btn-block btn-primary">Delete.</button>
+							</div>
+					  </div>
+					</div>
+				  </div>
+
+				  <!-- Controls -->
+				  <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+					<span class="glyphicon glyphicon-chevron-left"></span>
+				  </a>
+				  <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+					<span class="glyphicon glyphicon-chevron-right"></span>
+				  </a>
+				</div>
+		
+				<div class="progress">
+				  <div class="progress-bar" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="3" style="width: 33%;">
+					<span class="sr-only">33% Complete</span>
+				  </div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/customcode.js"></script>

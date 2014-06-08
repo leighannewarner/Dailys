@@ -1,0 +1,45 @@
+/* GENERAL */
+a {
+	text-decoration: none!important;
+}
+
+/* NAV */
+.nav-tabs.nav-justified > li > a {
+	border: none;
+	color: #333;
+}
+
+.nav-tabs.nav-justified > .active > a, .nav-tabs.nav-justified > .active > a:hover, .nav-tabs.nav-justified > .active > a:focus, .nav-tabs.nav-justified > .active > a:active {
+	border: none;
+	color: #428BCA;
+}
+
+.nav-tabs.nav-justified > li > a:hover, .nav-tabs.nav-justified > li > a:active {
+	color: #428BCA;
+	background: white;
+}
+
+/* FORM */
+.form-text-only {
+	height: 34px;
+	padding-top: 7px;
+}
+
+/* CAROUSEL */
+.carousel-inner .item {
+	height: 400px;
+	padding-left: 100px;
+	padding-right: 100px;
+	padding-top: 50px;
+	margin: 0px;
+	text-align: center;
+}
+
+.carousel-control.right, .carousel-control.left {
+	background: transparent;
+}
+
+/*.form-group.has-error .form-control[disabled], .form-group.has-warning .form-control[disabled], .form-group.has-success .form-control[disabled] {
+ 	color: #555;
+ 	border: 1px solid #CCC!important;
+ }*/
