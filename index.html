@@ -16,11 +16,11 @@
 
 				<!-- Nav tabs -->
 				<ul class="nav nav-tabs nav-justified">
-				  <li><a href="#add-task" data-toggle="tab"><h1 class="glyphicon glyphicon-plus-sign" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Add a task."></h1></a></li>
-				  <li><a href="#export-tasks" data-toggle="tab"><h1 class="glyphicon glyphicon-circle-arrow-up" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Export your list."></h1></a></li>
-				  <li><a href="#import-tasks" data-toggle="tab"><h1 class="glyphicon glyphicon-circle-arrow-down" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Import a list."></h1></a></li>
+				  <li><a href="#add-task" data-toggle="tab"><h1 class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Add a task."></h1></a></li>
+				  <li><a href="#export-tasks" data-toggle="tab"><h1 class=" glyphicon glyphicon-import" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Export your list."></h1></a></li>
+				  <li><a href="#import-tasks" data-toggle="tab"><h1 class=" glyphicon glyphicon-export" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Import a list."></h1></a></li>
 				  <li><a href="#help" data-toggle="tab"><h1 class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Help."></h1></a></li>
-				  <li class="active"><a href="#close" data-toggle="tab"><h1 class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Close the top panel."></h1></a></li>
+				  <li class="active"><a href="#list" data-toggle="tab"><h1 class="glyphicon glyphicon-tasks" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Display your list."></h1></a></li>
 				</ul>
 
 				<!-- Tab panes -->
@@ -42,7 +42,7 @@
 								  <option>Weekly</option>
 								  <option>Monthly</option>
 								  <option>Yearly</option>
-								  <option>Every...</option>
+								  <option disabled>Every...</option>
 								  <option>Never</option>
 								</select>
 							</div>
@@ -57,16 +57,23 @@
 								  <option>Years</option>
 								</select>
 							</div>
+							<br /><br />
+							<div id="weekly-input" class="col-sm-offset-2 col-sm-10">
+								<button id="monday-toggle" type="button" class="btn btn-default form-inline" data-toggle="button">Monday</button>
+								<button id="tuesday-toggle" type="button" class="btn btn-default form-inline" data-toggle="button">Tuesday</button>
+								<button id="wednesday-toggle" type="button" class="btn btn-default form-inline" data-toggle="button">Wednesday</button>
+								<button id="thursday-toggle" type="button" class="btn btn-default form-inline" data-toggle="button">Thursday</button>
+								<button id="friday-toggle" type="button" class="btn btn-default form-inline" data-toggle="button">Friday</button>
+								<button id="saturday-toggle" type="button" class="btn btn-default form-inline" data-toggle="button">Saturday</button>
+								<button id="sunday-toggle" type="button" class="btn btn-default form-inline" data-toggle="button">Sunday</button>
+							</div>
 						</div>
 						
 						<div class="form-group">
-							<label id="date-input-label" class="col-sm-2 control-label" for="date-input">Due Date</label>
-							<span id="date-input">
+							<label id="start-date-input-label" class="col-sm-2 control-label" for="date-input">Start Date</label>
+							<span id="start-date-input">
 								<div class="col-sm-3">
-									<button id="date-end-toggle" type="button" class="btn btn-default btn-block" data-toggle="button">Enabled</button>
-								</div>
-								<div class="col-sm-3">
-									<select id="month-input" class="form-control">
+									<select id="start-month-input" class="month-input form-control">
 									  <option>January</option>
 									  <option>February</option>
 									  <option>March</option>
@@ -82,7 +89,7 @@
 									</select>
 								</div>
 								<div class="col-sm-2">
-									<select id="day-input" class="form-control">
+									<select id="start-day-input" class="day-input form-control">
 									  <option>1</option>
 									  <option>2</option>
 									  <option>3</option>
@@ -117,17 +124,73 @@
 									</select>
 								</div>
 								<div class="col-sm-2">
-									<select id="year-input"  class="form-control">
+									<select id="start-year-input"  class="year-input form-control">
 									  <option>2014</option>
-									  <option>2015</option>
-									  <option>2016</option>
-									  <option>2017</option>
-									  <option>2018</option>
-									  <option>2019</option>
-									  <option>2020</option>
-									  <option>2021</option>
-									  <option>2022</option>
-									  <option>2023</option>
+									</select>
+								</div>
+							</span>
+						</div>
+						
+						<div class="form-group">
+							<label id="date-input-label" class="col-sm-2 control-label" for="date-input">Due Date</label>
+							<span id="date-input">
+								<div class="col-sm-3">
+									<button id="date-end-toggle" type="button" class="btn btn-default btn-block" data-toggle="button">Enabled</button>
+								</div>
+								<div class="col-sm-3">
+									<select id="month-input" class="month-input form-control">
+									  <option>January</option>
+									  <option>February</option>
+									  <option>March</option>
+									  <option>April</option>
+									  <option>May</option>
+									  <option>June</option>
+									  <option>July</option>
+									  <option>August</option>
+									  <option>September</option>
+									  <option>October</option>
+									  <option>November</option>
+									  <option>December</option>
+									</select>
+								</div>
+								<div class="col-sm-2">
+									<select id="day-input" class="day-input form-control">
+									  <option>1</option>
+									  <option>2</option>
+									  <option>3</option>
+									  <option>4</option>
+									  <option>5</option>
+									  <option>6</option>
+									  <option>7</option>
+									  <option>8</option>
+									  <option>9</option>
+									  <option>10</option>
+									  <option>11</option>
+									  <option>12</option>
+									  <option>13</option>
+									  <option>14</option>
+									  <option>15</option>
+									  <option>16</option>
+									  <option>17</option>
+									  <option>18</option>
+									  <option>19</option>
+									  <option>20</option>
+									  <option>21</option>
+									  <option>22</option>
+									  <option>23</option>
+									  <option>24</option>
+									  <option>25</option>
+									  <option>26</option>
+									  <option>27</option>
+									  <option>28</option>
+									  <option>29</option>
+									  <option>30</option>
+									  <option>31</option>
+									</select>
+								</div>
+								<div class="col-sm-2">
+									<select id="year-input"  class="year-input form-control">
+									  <option>2014</option>
 									</select>
 								</div>
 							</span>
@@ -170,7 +233,7 @@
 					  	
 					  	<div class="form-group hidden">
 							<div class="col-sm-4">
-								<h2> Are you sure? </h2>
+								<h3> There's a warning... </h3>
 							</div>
 							<div class="col-sm-4">
 								<button id="add-task-confirm" type="submit" class="btn btn-default btn-lg btn-block btn-success">Submit Anyway</button>
@@ -230,109 +293,17 @@
 							<li><h3><span class="glyphicon glyphicon-circle-arrow-up"></span> Export tasks as comma separated format. </h3></li>
 							<li><h3><span class="glyphicon glyphicon-circle-arrow-down"></span> Import new tasks from comma separated format. </h3></li>
 							<li><h3><span class="glyphicon glyphicon-question-sign"></span> This help page. </h3></li>
-							<li><h3><span class="glyphicon glyphicon-remove-sign"></span> Close this window. </h3></li>
+							<li><h3><span class="glyphicon glyphicon-tasks"></span> Display the list. </h3></li>
 						</ul>
 					</div>
 				</div>
-				  <div class="tab-pane active" id="close"><!-- EMPTY --></div>
+				  <div class="tab-pane active" id="list">
+				  	
 				</div>
 
 			</nav>
 		
-			<div class="row">
-				<div class="col-sm-12">
-				<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-				  <!-- Indicators -->
-				  <ol class="carousel-indicators">
-					<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
-					<li data-target="#carousel-example-generic" data-slide-to="1"></li>
-					<li data-target="#carousel-example-generic" data-slide-to="2"></li>
-				  </ol>
-
-				  <!-- Wrapper for slides -->
-				  <div class="carousel-inner">
-					<div class="item active">
-					  
-					  <a href="#"><h2 class="glyphicon glyphicon-pause"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Pause."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;
-					  <a href="#"><h2 class="glyphicon glyphicon-stop" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Restart."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;
-					  <a href="#"><h2 class="glyphicon glyphicon-edit"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Edit."></h2></a>
-					  
-					  <h1>My simple task.</h1>
-					  <h2>1 hour and 25 minutes remaining!</h2>
-					  <h2>Repeats daily.</h2>
-					  
-					  <div class="form-group">
-							<div class="col-sm-4">
-								<button id="add-task" type="submit" class="btn btn-success btn-lg btn-block btn-primary">Done!</button>
-							</div>
-							<div class="col-sm-4">
-								<button id="add-task" type="submit" class="btn btn-warning btn-lg btn-block btn-primary">Not today...</button>
-							</div>
-							<div class="col-sm-4">
-								<button id="add-task" type="submit" class="btn btn-danger btn-lg btn-block btn-primary">Delete.</button>
-							</div>
-					  </div>
-					</div>
-					
-					<div class="item">
-					  <a href="#"><h2 class="glyphicon glyphicon-play" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Start."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;
-					  <a href="#"><h2 class="glyphicon glyphicon-stop"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Restart."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;
-					  <a href="#"><h2 class="glyphicon glyphicon-edit"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Edit."></h2></a>
-					
-					  <h1>My simple task.</h1>
-					  <h2>for 1 hour and 15 minutes.</h2>
-					  <h2>Repeats daily.</h2>
-					  
-					  <div class="form-group">
-							<div class="col-sm-4">
-								<button id="add-task" type="submit" class="btn btn-success btn-lg btn-block btn-primary">Done!</button>
-							</div>
-							<div class="col-sm-4">
-								<button id="add-task" type="submit" class="btn btn-warning btn-lg btn-block btn-primary">Not today...</button>
-							</div>
-							<div class="col-sm-4">
-								<button id="add-task" type="submit" class="btn btn-danger btn-lg btn-block btn-primary">Delete.</button>
-							</div>
-					  </div>
-					</div>
 			
-					<div class="item">
-					  <a href="#"><h2 class="glyphicon glyphicon-edit"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Edit."></h2></a>
-					
-					  <h1>My less simple task.</h1>
-					  <h2>Incomplete</h2>
-					  <h2>Due June 1st, 2014.</h2>
-					  
-					  <div class="form-group">
-							<div class="col-sm-4">
-								<button id="add-task" type="submit" class="btn btn-success btn-lg btn-block btn-primary">Done!</button>
-							</div>
-							<div class="col-sm-4">
-								<button id="add-task" type="submit" class="btn btn-warning btn-lg btn-block btn-primary">Not today...</button>
-							</div>
-							<div class="col-sm-4">
-								<button id="add-task" type="submit" class="btn btn-danger btn-lg btn-block btn-primary">Delete.</button>
-							</div>
-					  </div>
-					</div>
-				  </div>
-
-				  <!-- Controls -->
-				  <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
-					<span class="glyphicon glyphicon-chevron-left"></span>
-				  </a>
-				  <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
-					<span class="glyphicon glyphicon-chevron-right"></span>
-				  </a>
-				</div>
-		
-				<div class="progress">
-				  <div class="progress-bar" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="3" style="width: 33%;">
-					<span class="sr-only">33% Complete</span>
-				  </div>
-				</div>
-			</div>
-		</div>
 	</body>
 </html>
 

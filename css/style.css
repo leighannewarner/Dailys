@@ -39,6 +39,18 @@ a {
 	background: transparent;
 }
 
+.carousel-inner .item .glyphicon-edit{
+	position: absolute;
+	top: 0px;
+	left: 105px;
+}
+
+.carousel-inner .item .glyphicon-remove{
+	position: absolute;
+	top: 0px;
+	right: 105px;
+}
+
 /*.form-group.has-error .form-control[disabled], .form-group.has-warning .form-control[disabled], .form-group.has-success .form-control[disabled] {
  	color: #555;
  	border: 1px solid #CCC!important;

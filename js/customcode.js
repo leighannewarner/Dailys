@@ -1,7 +1,4 @@
 $( document ).ready(function() {
-	$(".carousel").carousel({
-		interval: 0
-	})
 
 	$("h1.glyphicon").tooltip()
 	$("h2.glyphicon").tooltip()
@@ -9,15 +6,20 @@ $( document ).ready(function() {
 	adjustDateSelectors();
 	
 	checkIntervalInput();
+	checkWeeklyInput();
+	checkDateInput();
 	checkDateInput();
 	checkDateToggle();
 	checkTimedToggle();
+	
+	refreshList();
 });
 
 /* ADD TASK ASTHETICS */
 $("#repeat-input").change( function() {
 	checkIntervalInput();
 	checkDateInput();
+	checkWeeklyInput();
 })
 
 function checkIntervalInput() {
@@ -52,6 +54,27 @@ function hideIntervalInput() {
 	$("#interval-input").closest(".form-group").removeClass("has-success");
 	$("#interval-input").closest(".form-group").removeClass("has-warning");
 	$("#interval-input").closest(".form-group").removeClass("has-error");
+}
+
+function checkWeeklyInput() {
+	curr = $("#repeat-input").val();
+	if (curr == "Weekly") {
+		showWeeklyInput();
+	} else {
+		hideWeeklyInput();
+	}
+}
+
+function showWeeklyInput() {
+	$("#weekly-input .btn").prop("disabled", false);
+}
+
+function hideWeeklyInput() {
+	$("#weekly-input .btn").prop("disabled", true);
+	
+	$("#weekly-input .btn").closest(".form-group").removeClass("has-success");
+	$("#weekly-input .btn").closest(".form-group").removeClass("has-warning");
+	$("#weekly-input .btn").closest(".form-group").removeClass("has-error");
 }
 
 $("#timed-toggle").click( function() {
@@ -157,39 +180,54 @@ function hideDateInput() {
 	$("#day-input").addClass("invisible");
 	$("#year-input").addClass("invisible");*/
 	
-	console.log("should be removing error classes");
 	$("#date-input").closest(".form-group").removeClass("has-success");
 	$("#date-input").closest(".form-group").removeClass("has-warning");
 	$("#date-input").closest(".form-group").removeClass("has-error");
 }
 
 $("#month-input").change( function() {
-	setAvailableDays( $("#month-input option:selected").index() );
+	setAvailableDays( "#day-input", $("#month-input option:selected").index() );
+})
+
+$("#start-month-input").change( function() {
+	setAvailableDays( "#start-day-input", $("#start-month-input option:selected").index() );
 })
 
 /* DATE HANDLING */
 
 function adjustDateSelectors() {
+	adjustStartDateSelectors();
+	adjustEndDateSelectors();
+}
+
+function adjustStartDateSelectors() {
 	today = new Date();
 	
-	populateYears( today.getFullYear(), 1, 9 );
+	populateYears("#start-year-input", today.getFullYear(), 1, 9 );
+	setStartDate(today);
+}
+
+function adjustEndDateSelectors() {
+	today = new Date();
+	
+	populateYears("#year-input", today.getFullYear(), 1, 9 );
 	setDate(today);
 }
 
-function populateYears(year, lowerBuffer, higherBuffer) {
-	var resetVal = $("#year-input").val();
-	
-	$("#year-input option").remove();
+function populateYears(id, year, lowerBuffer, higherBuffer) {
+	var resetVal = $(id).val();
+
+	$(id + " option").remove();
 	for (var i = year-lowerBuffer; i <= year+higherBuffer; i++) {
-   		$('#year-input').append( $("<option></option>")
+   		$(id).append( $("<option></option>")
                     .attr("value", i)
                     .text(i)
                     .html(i) );
 	};
 }
 
-function setAvailableDays(month, year) {
-	var resetVal = $("#day-input").val();
+function setAvailableDays(id, month, year) {
+	var resetVal = $(id).val();
 	
 	//February
 	if (month == 1) {
@@ -206,16 +244,16 @@ function setAvailableDays(month, year) {
 		var max = 31;
 	}
 	
-	$("#day-input option").remove();
+	$(id + " option").remove();
 	for (var i = 1; i <= max; i++) {
-   		$('#day-input').append( $("<option></option>")
+   		$(id).append( $("<option></option>")
                     .attr("value", i)
                     .text(i)
                     .html(i) );
 	};
 	
 	if (resetVal <= max) {
-		$("#day-input").val(resetVal);
+		$(id).val(resetVal);
 	}
 }
 
@@ -225,11 +263,24 @@ function setDate(date) {
 	month = date.getMonth();
 	year = date.getFullYear();
 	
-	setAvailableDays( month, year );
+	setAvailableDays( "#day-input", month, year );
 	
 	$("#day-input").val(day);
 	$('#month-input option').eq(month).prop('selected', true);
 	$('#year-input').val(year);
+}
+
+function setStartDate(date) {
+	
+	day = date.getDate()+"";
+	month = date.getMonth();
+	year = date.getFullYear();
+	
+	setAvailableDays( "#start-day-input", month, year );
+	
+	$("#start-day-input").val(day);
+	$('#start-month-input option').eq(month).prop('selected', true);
+	$('#start-year-input').val(year);
 }
 
 /* ADD TASK FORM SUBMISSION HANDLING */
@@ -259,7 +310,6 @@ function submitAddForm(override) {
 	} else if (success == 1) {
 		addConfirm();
 	} else {
-		console.log("Error");
 		errorAttention();
 	}
 }
@@ -275,7 +325,40 @@ function errorAttention() {
 }
 
 function addTask() {
-	console.log("Add");
+	
+	//Create JSON object containing all info
+	var newDaily = { "descriptionInput":$("#description-input").val(),
+			"repeatInput":$("#repeat-input").val(),
+			"intervalInput":$("#interval-input").val(),
+			"intervalTypeInput":$("#interval-type-input").val(),
+			"weeklyToggles":[ {"monday":$("#monday-toggle").hasClass("active"),
+			                   "tuesday":$("#tuesday-toggle").hasClass("active"),
+			                   "wednesday":$("#wednesday-toggle").hasClass("active"),
+			                   "thursday":$("#thursday-toggle").hasClass("active"),
+			                   "friday":$("#friday-toggle").hasClass("active"),
+			                   "saturday":$("#saturday-toggle").hasClass("active"),
+			                   "sunday":$("sunday-toggle").hasClass("active")} ],
+			 "startMonthInput":$("#start-month-input").val(),
+			 "startDayInput":$("#start-day-input").val(),
+			 "startYearInput":$("#start-year-input").val(),
+			 "monthInput":$("#month-input").val(),
+			 "dayInput":$("#day-input").val(),
+			 "yearInput":$("#year-input").val(),
+			 "endDateToggle":$("#date-end-toggle").hasClass("active"),
+			 "endMonthInput":$("#end-month-input").val(),
+			 "endDayInput":$("#end-day-input").val(),
+			 "endYearInput":$("#end-year-input").val(),
+			 "repeatTypeInput":$("#repeat-type-input").val(),
+			 "timedToggle":$("#timed-toggle").hasClass("active"),
+			 "hoursInput":$("#hours-input").val(),
+			 "minutesInput":$("#minutes-input").val(),
+			 "lastCompleted":null }
+	
+	//Add to local storage	
+	localStorage["daily" + localStorage.length]= JSON.stringify(newDaily);
+	
+	
+	refreshList();
 }
 
 /* Data validation */
@@ -308,17 +391,37 @@ $("#repeat-input").change( function() {
 });
 
 $("#month-input").change( function() {
-	console.log("Validate month input");
 	validateDateInput();
+	validateStartDateInput();
 	changeButtonColor();
 });
 
 $("#day-input").change( function() {
 	validateDateInput();
+	validateStartDateInput();
 	changeButtonColor();
 });
 
 $("#year-input").change( function() {
+	validateDateInput();
+	validateStartDateInput();
+	changeButtonColor();
+});
+
+$("#start-month-input").change( function() {
+	validateStartDateInput();
+	validateDateInput();
+	changeButtonColor();
+});
+
+$("#start-day-input").change( function() {
+	validateStartDateInput();
+	validateDateInput();
+	changeButtonColor();
+});
+
+$("#start-year-input").change( function() {
+	validateStartDateInput();
 	validateDateInput();
 	changeButtonColor();
 });
@@ -339,14 +442,21 @@ $("#timed-toggle").click( function() {
 	changeButtonColor();
 });
 
+$("#weekly-input .btn").click( function() {
+	validateWeeklyInput();
+	changeButtonColor();
+});
+
 function validate() {
 	var s = 2;
 	
 	s = Math.min(validateDescriptionInput(), s);
 	s = Math.min(validateIntervalInput(), s);
 	s = Math.min(validateDateInput(), s);
+	s = Math.min(validateStartDateInput(), s);
 	s = Math.min(validateTimerInput(), s);
 	s = Math.min(validateRepeatTypeInput(), s);
+	s = Math.min(validateWeeklyInput(), s);
 	
 	changeButtonColor();
 	
@@ -440,10 +550,102 @@ function validateDateInput() {
 		} else {
 			$("#year-input").closest(".form-group").addClass("has-success");
 		}
+		
+		//Check if end date is before start date
+		if ($("#year-input").val() < $("#start-year-input").val()) {
+			$("#year-input").closest(".form-group").addClass("has-warning");
+			$("#start-year-input").closest(".form-group").removeClass("has-warning");
+			$("#start-year-input").closest(".form-group").addClass("has-warning");
+			return 1;
+		} else if ($("#year-input").val() == $("#start-year-input").val()) {
+			if ($("#month-input")[0].selectedIndex < $("#start-month-input")[0].selectedIndex) {
+				$("#month-input").closest(".form-group").addClass("has-warning");
+				$("#start-month-input").closest(".form-group").removeClass("has-warning");
+				$("#start-month-input").closest(".form-group").addClass("has-warning");
+				return 1;
+			} else if ($("#month-input")[0].selectedIndex == $("#start-month-input")[0].selectedIndex) {
+				if ($("#day-input").val() < $("#start-day-input").val()) {
+					$("#day-input").closest(".form-group").addClass("has-warning");
+					$("#start-day-input").closest(".form-group").removeClass("has-warning");
+					$("#start-day-input").closest(".form-group").addClass("has-warning");
+					return 1;
+				} else {
+					$("#day-input").closest(".form-group").addClass("has-success");
+				}
+			} else {
+				$("#month-input").closest(".form-group").addClass("has-success");
+			}
+		} else {
+			$("#year-input").closest(".form-group").addClass("has-success");
+		}
 	} else {
 		$("#date-input").closest(".form-group").addClass("has-success");
 	}
 		
+	return 2;
+}
+
+function validateStartDateInput() {
+	$("#start-date-input").closest(".form-group").removeClass("has-success");
+	$("#start-date-input").closest(".form-group").removeClass("has-warning");
+	$("#start-date-input").closest(".form-group").removeClass("has-error");
+
+	if ($("#year-input").val() < $("#start-year-input").val()) {
+		$("#start-year-input").closest(".form-group").removeClass("has-warning");
+		$("#start-year-input").closest(".form-group").addClass("has-warning");
+		return 1;
+	} else if ($("#year-input").val() == $("#start-year-input").val()) {
+		if ($("#month-input")[0].selectedIndex < $("#start-month-input")[0].selectedIndex) {
+			$("#start-month-input").closest(".form-group").removeClass("has-warning");
+			$("#start-month-input").closest(".form-group").addClass("has-warning");
+			return 1;
+		} else if ($("#month-input")[0].selectedIndex == $("#start-month-input")[0].selectedIndex) {
+			if ($("#day-input").val() < $("#start-day-input").val()) {
+				$("#start-day-input").closest(".form-group").removeClass("has-warning");
+				$("#start-day-input").closest(".form-group").addClass("has-warning");
+				return 1;
+			} else {
+				$("#start-day-input").closest(".form-group").addClass("has-success");
+			}
+		} else {
+			$("#start-month-input").closest(".form-group").addClass("has-success");
+		}
+	} else {
+		$("#start-year-input").closest(".form-group").addClass("has-success");
+	}
+		
+	return 2;
+}
+
+function validateWeeklyInput() {
+	$("#weekly-input").closest(".form-group").removeClass("has-success");
+	$("#weekly-input").closest(".form-group").removeClass("has-warning");
+	$("#weekly-input").closest(".form-group").removeClass("has-error");
+	
+	if ( $("#repeat-input").val() == "Weekly" 
+	  && !($("#monday-toggle").hasClass("active")) 
+      && !($("#tuesday-toggle").hasClass("active"))
+      && !($("#wednesday-toggle").hasClass("active"))
+      && !($("#thursday-toggle").hasClass("active")) 
+      && !($("#friday-toggle").hasClass("active")) 
+      && !($("#saturday-toggle").hasClass("active")) 
+      && !($("#sunday-toggle").hasClass("active")) ) {
+		$("#weekly-input").closest(".form-group").addClass("has-error");
+		return 2;
+	} else if ( $("#repeat-input").val() == "Weekly" 
+	  && $("#monday-toggle").hasClass("active") 
+      && $("#tuesday-toggle").hasClass("active") 
+      && $("#wednesday-toggle").hasClass("active") 
+      && $("#thursday-toggle").hasClass("active") 
+      && $("#friday-toggle").hasClass("active") 
+      && $("#saturday-toggle").hasClass("active") 
+      && $("#sunday-toggle").hasClass("active") ) {
+		$("#weekly-input").closest(".form-group").addClass("has-warning");
+		return 1;
+	} else {
+		$("#weekly-input").closest(".form-group").addClass("has-success");
+	}
+	
 	return 2;
 }
 
@@ -491,12 +693,280 @@ function resetAddForm() {
 	$("#hours-input").val("");
 	$("#minutes-input").val("");
 	$("#interval-type-input").val("Days");
-	
+
 	checkIntervalInput();
+	checkWeeklyInput();
 	checkDateInput();
 	
 	if ( $("#timed-toggle").html() == "Timed" ) {
 		checkTimedToggle();
 		$("#timed-toggle").removeClass("active");
 	}
+	
+	if ( $("#date-end-toggle").html() == "Enabled" ) {
+		checkDateToggle();
+		$("#date-end-toggle").removeClass("active");
+	}
+}
+
+/* Set up list */
+
+function refreshList() {
+	
+	tasks = false;
+
+	if(localStorage.length > 0) {
+	
+		//Basic framework for the carousel
+		$("#list").html('<div class="row"><div class="col-sm-12">' +
+							'<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">' +
+							  '<!-- Indicators -->' +
+							  '<ol class="carousel-indicators">'+
+							  '</ol>' +
+							  '<!-- Wrapper for slides -->' +
+							 ' <div class="carousel-inner">' +
+							 '</div>' +
+
+							  '<!-- Controls -->' +
+							 ' <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">' +
+								'<span class="glyphicon glyphicon-chevron-left"></span>' +
+							  '</a>' +
+							  '<a class="right carousel-control" href="#carousel-example-generic" data-slide="next">' +
+								'<span class="glyphicon glyphicon-chevron-right"></span>' +
+							  '</a>' +
+							'</div>' +
+		
+							'<div class="progress">' +
+							  '<div class="progress-bar" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="3" style="width: 0%;">' +
+								'<span class="sr-only">0% Complete</span>' +
+							  '</div>' +
+							'</div>' +
+						'</div>' +
+						'</div>');
+						
+		$(".carousel").carousel({
+			interval: 0
+		});
+		
+		for(var i = 0; i < localStorage.length; i++) {
+			current = JSON.parse(localStorage["daily" + i]);
+
+			today = new Date();
+			today.setHours(0);
+			today.setMinutes(0);
+			today.setSeconds(0);
+			today.setMilliseconds(0);
+			
+			startDate = new Date(current["startMonthInput"] + " " + current["startDayInput"] + " " + current["startYearInput"]);
+			if (current["dateEndToggle"]) {
+				endDate = new Date(current["endMonthInput"] + " " + current["endDayInput"] + " " + current["endYearInput"]);
+			}
+			
+			//Remove finished tasks
+			if (current["lastCompleted"] != null  && (current["repeatType"] == "Never" || (current["dateEndToggle"] && (today > endDate)))) {
+				localStorage.removeItem("daily" + i);
+				break;
+			}
+
+			//Reset completion
+			//Right now only resets "normally." This means there are no duplicate
+			//tasks. In "Only if completed" duplicate tasks would appear if the previous 
+			//iteration was not completed. This needs to be written still.
+			//A copy of the task would be made. This task would be a one time task.
+			
+			//daily
+			if (current["repeatInput"] == "Daily" && current["lastCompleted"] != null && current["lastCompleted"] < today) {
+				if (current["repeatTypeInput"] == "Normally") {
+					current["lastCompleted"] = null;
+				} else {
+					//duplicate task for each day last completed to yesterday
+					current["lastCompleted"] = null;
+				}
+			}
+			
+			//weekly
+			switch (today.getDate()) {
+				case 0:
+					weekday = "sunday";
+					break;
+				case 1:
+					weekday = "monday";
+					break;
+				case 2:
+					weekday = "tuesday";
+					break;
+				case 3:
+					weekday = "wednesday";
+					break;
+				case 4:
+					weekday = "thursday";
+					break;
+				case 5:
+					weekday = "friday";
+					break;
+				case 6:
+					weekday = "saturday";
+					break;
+			} 
+			
+			if (current["repeatInput"] == "Weekly" && current["lastCompleted"] != null && current["lastCompleted"] < today && current["weeklyToggles"][0][weekday]) {
+				if (current["repeatTypeInput"] == "Normally" ) {
+					current["lastCompleted"] = null;
+				} else {
+					//duplicate task for every week from last completed to yesterday
+					current["lastCompleted"] = null;
+				}
+			}
+			
+			//monthly
+			if (current["repeatInput"] == "Monthly" && current["lastCompleted"] != null && current["lastCompleted"] < today && today.getDate() == startDate.getDate()) {
+				if (current["repeatTypeInput"] == "Normally" ) {
+					current["lastCompleted"] = null;
+				} else {
+					//duplicate task for every repeated month from last completed to yesterday
+					current["lastCompleted"] = null;
+				}
+			}
+			
+			//yearly
+			if (current["repeatInput"] == "Yearly" && current["lastCompleted"] != null && current["lastCompleted"] < today &&  (today.getDate() == startDate.getDate() &&  today.getMonth() == startMonth.getMonth())) {
+				if (normally) {
+					current["lastCompleted"] = null;
+				} else {
+					//duplicate task for every year from last completed to yesterday
+					current["lastCompleted"] = null;
+				}
+			}
+			
+			//custom
+			//TODO do custom interval logic
+			/*if (current["repeatInput"] == "Every..." && current["lastCompleted"] != null && current["lastCompleted"] < today) {
+				if (current["intervalTypeInput"] == "Days") {
+					if (normally) {
+						current["lastCompleted"] = null;
+					} else {
+						//duplicate task for every repeat from last completed to yesterday
+						current["lastCompleted"] = null;
+					}
+				} else if (current["intervalTypeInput"] == "Weeks") {
+					if (normally) {
+						current["lastCompleted"] = null;
+					} else {
+						//duplicate task for every repeat from last completed to yesterday
+						current["lastCompleted"] = null;
+					}
+				} else if (current["intervalTypeInput"] == "Months") {
+					if (normally) {
+						current["lastCompleted"] = null;
+					} else {
+						//duplicate task for every repeat from last completed to yesterday
+						current["lastCompleted"] = null;
+					}
+				} else if (current["intervalTypeInput"] == "Years) {
+					if (normally) {
+						current["lastCompleted"] = null;
+					} else {
+						//duplicate task for every repeat from last completed to yesterday
+						current["lastCompleted"] = null;
+					}
+				}
+			}*/
+			
+			if ( (current["lastCompleted"] == null) && (startDate >= today) ) {
+				$("#list .carousel-inner").html(newListItem(current, i));
+				tasks = true;
+			}
+		}	
+	} else {
+		//No carousel needed, just show a simple message
+		$("#list").html("<div class='well well-lg text-center'><h2>There doesn't seem to be any tasks today.</h2>")
+	}
+	
+	if (!tasks) {
+		$("#list").html("<div class='well well-lg text-center'><h2>You're all done for today!</h2>")
+	}
+	
+	$("#list .carousel h4.glyphicon").tooltip();
+	$("#list .carousel h2.glyphicon").tooltip();
+	$("#list .carousel button").tooltip();
+}
+
+function newListItem(current, i) {
+	timerText = "";
+	if (current["timedToggle"]) {
+		timerText =  current["hoursInput"] + " hour and " + current["minutesInput"] + " minutes remaining!";
+	}
+
+	if (!tasks) {
+		returnMe = '<div class="item active">' +
+				
+					'<h4 class="glyphicon glyphicon-edit"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Edit."></h4>&nbsp;' +		
+					'<a href="#"><h4 class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Delete."></h4></a>';
+
+		if (current["timedToggle"]) {
+			returnMe +=	'<a href="#" onClick="alert (\'delete\')"><h2 class="glyphicon glyphicon-pause"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Pause."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;' +
+					    '<a href="#"><h2 class="glyphicon glyphicon-stop" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Restart."></h2></a>';
+		}
+		
+		returnMe +=	'<h1>' + current["descriptionInput"] + '</h1>' +
+				  '<h2>' + timerText + '</h2>' +
+				  '<h2>Repeats ' + current["repeatInput"] + '. </h2>' +
+
+				  '<br/><div class="form-group">' +
+						'<div class="col-sm-4">' +
+						'	<button type="submit" class="finish-task btn btn-success btn-lg btn-block btn-primary" onClick="finishDaily(\'daily' + i + '\')">Done!</button>' +
+						'</div>' +
+						'<div class="col-sm-4">' +
+						'	<button type="submit" class="postpone-task btn btn-warning btn-lg btn-block btn-primary" disabled>Not today...</button>' +
+						'</div>' +
+						'<div class="col-sm-4">' +
+						'	<button type="submit" class="remove-task btn btn-danger btn-lg btn-block btn-primary" disabled>Remove.</button>' +
+						'</div>' +
+				  '</div>' +
+				'</div>';
+		} else {
+			returnMe = $("#list .carousel-inner").html() + '<div class="item" data-key="daily' + i + '">' +
+				
+					'<h4 class="glyphicon glyphicon-edit"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Edit."></h4> &nbsp;' +		
+					'<a href="#" onClick="deleteDaily(\'daily' + i + '\')"><h4 class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Delete." title="Restart."></h4></a>';
+
+			if (current["timedToggle"]) {
+				returnMe +=	'<a href="#"><h2 class="glyphicon glyphicon-pause"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Pause."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;' +
+							'<a href="#"><h2 class="glyphicon glyphicon-stop" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Restart."></h2></a>';
+			}
+		
+			returnMe +=	'<h1>' + current["descriptionInput"] + '</h1>' +
+					  '<h2>' + timerText + '</h2>' +
+					  '<h2>Repeats ' + current["repeatInput"] + '. </h2>' +
+
+					  '<br/><div class="form-group">' +
+							'<div class="col-sm-4">' +
+							'	<button type="submit" class="finish-task btn btn-success btn-lg btn-block btn-primary" onClick="finishDaily(\'daily' + i + '\')">Done!</button>' +
+							'</div>' +
+							'<div class="col-sm-4">' +
+							'	<button type="submit" class="postpone-task btn btn-warning btn-lg btn-block btn-primary" disabled>Not today...</button>' +
+							'</div>' +
+							'<div class="col-sm-4">' +
+							'	<button type="submit" class="remove-task btn btn-danger btn-lg btn-block btn-primary" disabled>Remove.</button>' +
+							'</div>' +
+					  '</div>' +
+					'</div>';
+	}
+		
+	return returnMe;
+}
+
+function finishDaily(key) {
+	current = JSON.parse(localStorage[key]);
+	today = new Date();
+	today.setHours(0);
+	today.setMinutes(0);
+	today.setSeconds(0);
+	today.setMilliseconds(0);
+	current["lastCompleted"] = today;
+	localStorage[key] = JSON.stringify(current);
+}
+
+function deleteDaily(key) {
+	alert ("delete");
 }
