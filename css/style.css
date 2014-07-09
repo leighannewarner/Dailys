@@ -32,7 +32,9 @@ a {
 	padding-right: 100px;
 	padding-top: 50px;
 	margin: 0px;
+	margin-bottom: 5px;
 	text-align: center;
+	border-radius: 10px;
 }
 
 .carousel-control.right, .carousel-control.left {
@@ -49,6 +51,22 @@ a {
 	position: absolute;
 	top: 0px;
 	right: 105px;
+}
+
+.carousel-inner .item.completed {
+	background: #eee;
+}
+
+.carousel-inner .item.completed .start, .carousel-inner .item.completed .pause, .carousel-inner .item.completed .stop {
+	visibility: hidden;
+}
+
+.carousel-inner .item.not-completed .done-text, .carousel-inner .item.completed .timer-text, .carousel-inner .item.completed .form-group.not-done, .carousel-inner .item.not-completed .form-group.done {
+	display: none;
+}
+
+.carousel-inner .item.completed .done-text, .carousel-inner .item.not-complete .timer-text,.carousel-inner .item.completed .form-group.done, .carousel-inner .item.not-completed .form-group.not-done {
+	display: block;
 }
 
 /*.form-group.has-error .form-control[disabled], .form-group.has-warning .form-control[disabled], .form-group.has-success .form-control[disabled] {

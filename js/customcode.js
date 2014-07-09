@@ -1,3 +1,5 @@
+var timerList = {};
+
 $( document ).ready(function() {
 
 	$("h1.glyphicon").tooltip()
@@ -897,14 +899,20 @@ function refreshList() {
 				}
 			}*/
 			
-			if ( (current["lastCompleted"] == null)  && startDate <= today) {
+			if (startDate <= today) {
 				console.log("Printing " + currentKey + " " + current["descriptionInput"]);
 				$("#list .carousel-inner").html(newListItem(current, currentKey));
 				tasks = true;
-			} else if (current["lastCompleted"] != null) {
-				console.log("Not printing " + current["descriptionInput"] + " because of null.");
+			} 
+			
+			if (current["lastCompleted"] != null) {
+				$("#" + currentKey).removeClass("not-completed");
+				$("#" + currentKey).removeClass("completed");
+				$("#" + currentKey).addClass("completed");
 			} else {
-				console.log("Not printing " + current["descriptionInput"] + " because of start date.");
+				$("#" + currentKey).removeClass("completed");
+				$("#" + currentKey).removeClass(" not-completed");
+				$("#" + currentKey).addClass("not-completed");
 			}
 		}	
 	} else {
@@ -925,30 +933,32 @@ function newListItem(current, currentKey) {
 	timerText = "";
 	if (current["timedToggle"]) {
 		if (current["hoursInput"] != "" && current["minutesInput"] != "") {
-			timerText =  hhfrtcurrent["hoursInput"] + " hour(s) and " + current["minutesInput"] + " minute(s) remaining!";
+			timerText =  "<span class='hourText'> <span class='hourCount'>" + current["hoursInput"] + "</span> hour(s) and</span> <span class='minuteText'> <span class='minuteCount'>" + current["minutesInput"] + "</span> minute(s)</span> remaining!";
 		} else if (current["hoursInput"] != "" && current["minutesInput"] == "") {
-			 timerText = current["hoursInput"] + " hour(s) remaining!";
+			 timerText = "<span class='hourText'> <span class='hourCount'>" + current["hoursInput"] + "</span> hour(s) and</span> <span class='minuteText'> <span class='minuteCount'>0</span> minute(s)</span> remaining!";
 		} else if (current["hoursInput"] == "" && current["minutesInput"] != "") {
-			 timerText = current["minutesInput"] + " minute(s) remaining!";
+			 timerText = "<span class='hourText'> <span class='hourCount'>0</span> hour(s) and</span> <span class='minuteText'> <span class='minuteCount'>" + current["minutesInput"] + "</span> minute(s)</span> remaining!";
 		}
 	}
 
 	if (!tasks) {
-		returnMe = '<div class="item active">' +
+		returnMe = '<div class="item active" id="' + currentKey + '" data-key="' + currentKey + '">' +
 				
 					'<h4 class="glyphicon glyphicon-edit"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Edit."></h4>&nbsp;' +		
 					'<a href="#item" onclick="deleteDaily(\'' + currentKey + '\')"><h4 class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Delete."></h4></a>';
 
 		if (current["timedToggle"]) {
-			returnMe +=	'<a href="#"><h2 class="glyphicon glyphicon-play"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Pause."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;' +
-					    '<a href="#"><h2 class="glyphicon glyphicon-stop" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Restart."></h2></a>';
+			returnMe +=	'<a class="start" href="#" onclick="startTimer(\'' + currentKey + '\')"><h2 class="glyphicon glyphicon-play"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Start."></h2></a>' +
+					    '<a class="pause" href="#" onclick="pauseTimer(\'' + currentKey + '\')" class="hidden"><h2 class="glyphicon glyphicon-pause hidden"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Pause."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;' +
+					    '<a class="stop"  href="#item" onclick="stopTimer(\'' + currentKey + '\')"><h2 class="glyphicon glyphicon-stop" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Restart."></h2></a>';
 		}
 		
 		returnMe +=	'<h1>' + current["descriptionInput"] + '</h1>' +
-				  '<h2>' + timerText + '</h2>' +
+				  '<h2 class="timer-text">' + timerText + '</h2>' +
+				  '<h2 class="done-text"> Done! </h2>' +
 				  '<h2>Repeats ' + current["repeatInput"] + '. </h2>' +
 
-				  '<br/><div class="form-group">' +
+				  '<br/><div class="form-group not-done">' +
 						'<div class="col-sm-4">' +
 						'	<button type="submit" class="finish-task btn btn-success btn-lg btn-block btn-primary" onClick="finishDaily(\'' + currentKey + '\')">Done!</button>' +
 						'</div>' +
@@ -959,23 +969,30 @@ function newListItem(current, currentKey) {
 						'	<button type="submit" class="remove-task btn btn-danger btn-lg btn-block btn-primary" disabled>Remove.</button>' +
 						'</div>' +
 				  '</div>' +
+				  '<div class="form-group done">' +
+						'<div class="col-sm-12">' +
+						'	<button type="submit" class="postpone-task btn btn-lg btn-block btn-primary" onClick="unfinishDaily(\'' + currentKey + '\')">Not done.</button>' +
+						'</div>' +
+				  '</div>' +
 				'</div>';
 		} else {
-			returnMe = $("#list .carousel-inner").html() + '<div class="item" data-key="' + currentKey + '">' +
+			returnMe = $("#list .carousel-inner").html() + '<div class="item" id="' + currentKey + '" data-key="' + currentKey + '">' +
 				
 					'<h4 class="glyphicon glyphicon-edit"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Edit."></h4> &nbsp;' +		
-					'<a href="#item" onclick="deleteDaily(\'' + currentKey + '\')"><h4 class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Delete." title="Restart."></h4></a>';
+					'<a href="#item" onclick="deleteDaily(\'' + currentKey + '\')"><h4 class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Delete."></h4></a>';
 
 			if (current["timedToggle"]) {
-				returnMe +=	'<a href="#"><h2 class="glyphicon glyphicon-play"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Pause."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;' +
-							'<a href="#"><h2 class="glyphicon glyphicon-stop" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Restart."></h2></a>';
+				returnMe +=	'<a class="start" href="#" onclick="startTimer(\'' + currentKey + '\')"><h2 class="glyphicon glyphicon-play"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Start."></h2></a>' +
+					    '<a class="pause" href="#" onclick="pauseTimer(\'' + currentKey + '\')" class="hidden"><h2 class="glyphicon glyphicon-pause hidden"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Pause."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;' +
+					    '<a class="stop"  href="#item" onclick="stopTimer(\'' + currentKey + '\')"><h2 class="glyphicon glyphicon-stop" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Restart."></h2></a>';
 			}
 		
 			returnMe +=	'<h1>' + current["descriptionInput"] + '</h1>' +
-					  '<h2>' + timerText + '</h2>' +
+					  '<h2 class="timer-text">' + timerText + '</h2>' +
+				 	  '<h2 class="done-text"> Done! </h2>' +
 					  '<h2>Repeats ' + current["repeatInput"] + '. </h2>' +
 
-					  '<br/><div class="form-group">' +
+					  '<br/><div class="form-group not-done">' +
 							'<div class="col-sm-4">' +
 							'	<button type="submit" class="finish-task btn btn-success btn-lg btn-block btn-primary" onClick="finishDaily(\'' + currentKey + '\')">Done!</button>' +
 							'</div>' +
@@ -986,6 +1003,11 @@ function newListItem(current, currentKey) {
 							'	<button type="submit" class="remove-task btn btn-danger btn-lg btn-block btn-primary" disabled>Remove.</button>' +
 							'</div>' +
 					  '</div>' +
+					  '<div class="form-group done">' +
+						'<div class="col-sm-12">' +
+						'	<button type="submit" class="postpone-task btn btn-lg btn-block btn-primary" onClick="unfinishDaily(\'' + currentKey + '\')">Not done.</button>' +
+						'</div>' +
+				  '</div>' +
 					'</div>';
 	}
 		
@@ -1004,17 +1026,42 @@ function finishDaily(key) {
 	refreshList();
 }
 
+function unfinishDaily(key) {
+	current = JSON.parse(localStorage[key]);
+	current["lastCompleted"] = null;
+	localStorage[key] = JSON.stringify(current);
+	refreshList();
+}
+
 function deleteDaily(key) {
 	localStorage.removeItem(key);
 	refreshList();
 }
 
 function startTimer(key) {
+	$("#" + key + " .start").removeClass("hidden");
+	$("#" + key + " .start").addClass("hidden");
+	$("#" + key + " .start .glyphicon").removeClass("hidden");
+	$("#" + key + " .start .glyphicon").addClass("hidden");
 	
+	
+	$("#" + key + " .pause").removeClass("hidden");
+	$("#" + key + " .pause .glyphicon").removeClass("hidden");
+	
+	 timerList[key] = setInterval(function() { decrementTimer(key); }, 600);
 }
 
 function pauseTimer(key) {
+	$("#" + key + " .pause").removeClass("hidden");
+	$("#" + key + " .pause").addClass("hidden");
+	$("#" + key + " .pause .glyphicon").removeClass("hidden");
+	$("#" + key + " .pause .glyphicon").addClass("hidden");
 	
+	
+	$("#" + key + " .start").removeClass("hidden");
+	$("#" + key + " .start .glyphicon").removeClass("hidden");
+	
+	clearInterval(timerList[key]);
 }
 
 function pauseAllTimers() {
@@ -1024,10 +1071,38 @@ function pauseAllTimers() {
 }
 
 function stopTimer(key) {
+	$("#" + key + " .pause").removeClass("hidden");
+	$("#" + key + " .pause").addClass("hidden");
+	$("#" + key + " .pause .glyphicon").removeClass("hidden");
+	$("#" + key + " .pause .glyphicon").addClass("hidden");
+	
+	
+	$("#" + key + " .start").removeClass("hidden");
+	$("#" + key + " .start .glyphicon").removeClass("hidden");
+	
+	current = JSON.parse(localStorage[key]);
+	$("#" + key + " .minuteCount").html(current["minutesInput"]);
+	$("#" + key + " .hourCount").html(current["hoursInput"]);
+	
+	clearInterval(timerList[key]);
+}
 
+function decrementTimer(key) {
+	if (parseInt($("#" + key + " .minuteCount").html()) == 0 && parseInt($("#" + key + " .hourCount").html()) >= 1) {
+		$("#" + key + " .minuteCount").html(59);
+		$("#" + key + " .hourCount").html(parseInt($("#" + key + " .hourCount").html()-1));
+	} else {
+		$("#" + key + " .minuteCount").html(parseInt($("#" + key + " .minuteCount").html()-1));
+	}
+	
+	if (parseInt($("#" + key + " .minuteCount").html()) == 0 && parseInt($("#" + key + " .hourCount").html()) == 0) {
+		console.log("Done with timer " + key);
+		doneTimer(key);
+	}
 }
 
 function doneTimer(key) {
+	stopTimer(key);
 	alert("Done with " + key + "!");
 	finishDaily(key);
 }
