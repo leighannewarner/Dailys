@@ -354,8 +354,16 @@ function addTask() {
 			 "minutesInput":$("#minutes-input").val(),
 			 "lastCompleted":null }
 	
-	//Add to local storage	
-	localStorage["daily" + localStorage.length]= JSON.stringify(newDaily);
+	//Add to local storage
+	if (localStorage.getItem("daily" + localStorage.length) === null) {	
+		localStorage["daily" + localStorage.length]= JSON.stringify(newDaily);
+	} else {
+		var counter = 0;
+		while (localStorage.getItem("daily" + counter) === null) {
+			localStorage["daily" + counter] = JSON.stringify(newDaily);
+			counter += 1;
+		}
+	}
 	
 	
 	refreshList();
@@ -713,6 +721,8 @@ function resetAddForm() {
 
 function refreshList() {
 	
+	pauseAllTimers();
+	
 	tasks = false;
 
 	if(localStorage.length > 0) {
@@ -749,7 +759,8 @@ function refreshList() {
 		});
 		
 		for(var i = 0; i < localStorage.length; i++) {
-			current = JSON.parse(localStorage["daily" + i]);
+			currentKey = localStorage.key(i);
+			current = JSON.parse(localStorage.getItem(currentKey));
 
 			today = new Date();
 			today.setHours(0);
@@ -760,6 +771,10 @@ function refreshList() {
 			startDate = new Date(current["startMonthInput"] + " " + current["startDayInput"] + " " + current["startYearInput"]);
 			if (current["dateEndToggle"]) {
 				endDate = new Date(current["endMonthInput"] + " " + current["endDayInput"] + " " + current["endYearInput"]);
+			}
+			
+			if (current["lastCompleted"] != null) {
+				lastCompleted = new Date(current["lastCompleted"]);
 			}
 			
 			//Remove finished tasks
@@ -775,12 +790,16 @@ function refreshList() {
 			//A copy of the task would be made. This task would be a one time task.
 			
 			//daily
-			if (current["repeatInput"] == "Daily" && current["lastCompleted"] != null && current["lastCompleted"] < today) {
+			console.log (current["lastCompleted"] + " / " + today);
+			if ((current["repeatInput"] == "Daily") && (current["lastCompleted"] != null) && lastCompleted < today) {
+				
 				if (current["repeatTypeInput"] == "Normally") {
 					current["lastCompleted"] = null;
+					localStorage["daily" + i] = JSON.stringify(current);
 				} else {
 					//duplicate task for each day last completed to yesterday
 					current["lastCompleted"] = null;
+					localStorage["daily" + i] = JSON.stringify(current);
 				}
 			}
 			
@@ -809,32 +828,38 @@ function refreshList() {
 					break;
 			} 
 			
-			if (current["repeatInput"] == "Weekly" && current["lastCompleted"] != null && current["lastCompleted"] < today && current["weeklyToggles"][0][weekday]) {
+			if (current["repeatInput"] == "Weekly" && current["lastCompleted"] != null && lastCompleted < today && current["weeklyToggles"][0][weekday]) {
 				if (current["repeatTypeInput"] == "Normally" ) {
 					current["lastCompleted"] = null;
+					localStorage[key] = JSON.stringify(current);
 				} else {
 					//duplicate task for every week from last completed to yesterday
 					current["lastCompleted"] = null;
+					localStorage[key] = JSON.stringify(current);
 				}
 			}
 			
 			//monthly
-			if (current["repeatInput"] == "Monthly" && current["lastCompleted"] != null && current["lastCompleted"] < today && today.getDate() == startDate.getDate()) {
+			if (current["repeatInput"] == "Monthly" && current["lastCompleted"] != null && lastCompleted < today && today.getDate() == startDate.getDate()) {
 				if (current["repeatTypeInput"] == "Normally" ) {
 					current["lastCompleted"] = null;
+					localStorage[key] = JSON.stringify(current);
 				} else {
 					//duplicate task for every repeated month from last completed to yesterday
 					current["lastCompleted"] = null;
+					localStorage[key] = JSON.stringify(current);
 				}
 			}
 			
 			//yearly
-			if (current["repeatInput"] == "Yearly" && current["lastCompleted"] != null && current["lastCompleted"] < today &&  (today.getDate() == startDate.getDate() &&  today.getMonth() == startMonth.getMonth())) {
+			if (current["repeatInput"] == "Yearly" && current["lastCompleted"] != null && lastCompleted < today &&  (today.getDate() == startDate.getDate() &&  today.getMonth() == startMonth.getMonth())) {
 				if (normally) {
 					current["lastCompleted"] = null;
+					localStorage[key] = JSON.stringify(current);
 				} else {
 					//duplicate task for every year from last completed to yesterday
 					current["lastCompleted"] = null;
+					localStorage[key] = JSON.stringify(current);
 				}
 			}
 			
@@ -872,17 +897,22 @@ function refreshList() {
 				}
 			}*/
 			
-			if ( (current["lastCompleted"] == null) && (startDate >= today) ) {
-				$("#list .carousel-inner").html(newListItem(current, i));
+			if ( (current["lastCompleted"] == null)  && startDate <= today) {
+				console.log("Printing " + currentKey + " " + current["descriptionInput"]);
+				$("#list .carousel-inner").html(newListItem(current, currentKey));
 				tasks = true;
+			} else if (current["lastCompleted"] != null) {
+				console.log("Not printing " + current["descriptionInput"] + " because of null.");
+			} else {
+				console.log("Not printing " + current["descriptionInput"] + " because of start date.");
 			}
 		}	
 	} else {
 		//No carousel needed, just show a simple message
-		$("#list").html("<div class='well well-lg text-center'><h2>There doesn't seem to be any tasks today.</h2>")
+		$("#list").html("<div class='well well-lg text-center'><h2>There doesn't seem to be any tasks.</h2>")
 	}
 	
-	if (!tasks) {
+	if (!tasks && localStorage.length > 0) {
 		$("#list").html("<div class='well well-lg text-center'><h2>You're all done for today!</h2>")
 	}
 	
@@ -891,20 +921,26 @@ function refreshList() {
 	$("#list .carousel button").tooltip();
 }
 
-function newListItem(current, i) {
+function newListItem(current, currentKey) {
 	timerText = "";
 	if (current["timedToggle"]) {
-		timerText =  current["hoursInput"] + " hour and " + current["minutesInput"] + " minutes remaining!";
+		if (current["hoursInput"] != "" && current["minutesInput"] != "") {
+			timerText =  hhfrtcurrent["hoursInput"] + " hour(s) and " + current["minutesInput"] + " minute(s) remaining!";
+		} else if (current["hoursInput"] != "" && current["minutesInput"] == "") {
+			 timerText = current["hoursInput"] + " hour(s) remaining!";
+		} else if (current["hoursInput"] == "" && current["minutesInput"] != "") {
+			 timerText = current["minutesInput"] + " minute(s) remaining!";
+		}
 	}
 
 	if (!tasks) {
 		returnMe = '<div class="item active">' +
 				
 					'<h4 class="glyphicon glyphicon-edit"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Edit."></h4>&nbsp;' +		
-					'<a href="#"><h4 class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Delete."></h4></a>';
+					'<a href="#item" onclick="deleteDaily(\'' + currentKey + '\')"><h4 class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Delete."></h4></a>';
 
 		if (current["timedToggle"]) {
-			returnMe +=	'<a href="#" onClick="alert (\'delete\')"><h2 class="glyphicon glyphicon-pause"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Pause."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;' +
+			returnMe +=	'<a href="#"><h2 class="glyphicon glyphicon-play"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Pause."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;' +
 					    '<a href="#"><h2 class="glyphicon glyphicon-stop" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Restart."></h2></a>';
 		}
 		
@@ -914,7 +950,7 @@ function newListItem(current, i) {
 
 				  '<br/><div class="form-group">' +
 						'<div class="col-sm-4">' +
-						'	<button type="submit" class="finish-task btn btn-success btn-lg btn-block btn-primary" onClick="finishDaily(\'daily' + i + '\')">Done!</button>' +
+						'	<button type="submit" class="finish-task btn btn-success btn-lg btn-block btn-primary" onClick="finishDaily(\'' + currentKey + '\')">Done!</button>' +
 						'</div>' +
 						'<div class="col-sm-4">' +
 						'	<button type="submit" class="postpone-task btn btn-warning btn-lg btn-block btn-primary" disabled>Not today...</button>' +
@@ -925,13 +961,13 @@ function newListItem(current, i) {
 				  '</div>' +
 				'</div>';
 		} else {
-			returnMe = $("#list .carousel-inner").html() + '<div class="item" data-key="daily' + i + '">' +
+			returnMe = $("#list .carousel-inner").html() + '<div class="item" data-key="' + currentKey + '">' +
 				
 					'<h4 class="glyphicon glyphicon-edit"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Edit."></h4> &nbsp;' +		
-					'<a href="#" onClick="deleteDaily(\'daily' + i + '\')"><h4 class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Delete." title="Restart."></h4></a>';
+					'<a href="#item" onclick="deleteDaily(\'' + currentKey + '\')"><h4 class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Delete." title="Restart."></h4></a>';
 
 			if (current["timedToggle"]) {
-				returnMe +=	'<a href="#"><h2 class="glyphicon glyphicon-pause"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Pause."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;' +
+				returnMe +=	'<a href="#"><h2 class="glyphicon glyphicon-play"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Pause."></h2></a> &nbsp; &nbsp; &nbsp; &nbsp;' +
 							'<a href="#"><h2 class="glyphicon glyphicon-stop" data-toggle="tooltip" data-placement="bottom" data-container="false" title="Restart."></h2></a>';
 			}
 		
@@ -941,7 +977,7 @@ function newListItem(current, i) {
 
 					  '<br/><div class="form-group">' +
 							'<div class="col-sm-4">' +
-							'	<button type="submit" class="finish-task btn btn-success btn-lg btn-block btn-primary" onClick="finishDaily(\'daily' + i + '\')">Done!</button>' +
+							'	<button type="submit" class="finish-task btn btn-success btn-lg btn-block btn-primary" onClick="finishDaily(\'' + currentKey + '\')">Done!</button>' +
 							'</div>' +
 							'<div class="col-sm-4">' +
 							'	<button type="submit" class="postpone-task btn btn-warning btn-lg btn-block btn-primary" disabled>Not today...</button>' +
@@ -965,8 +1001,55 @@ function finishDaily(key) {
 	today.setMilliseconds(0);
 	current["lastCompleted"] = today;
 	localStorage[key] = JSON.stringify(current);
+	refreshList();
 }
 
 function deleteDaily(key) {
-	alert ("delete");
+	localStorage.removeItem(key);
+	refreshList();
+}
+
+function startTimer(key) {
+	
+}
+
+function pauseTimer(key) {
+	
+}
+
+function pauseAllTimers() {
+	for(var i = 0; i < localStorage.length; i++) {
+		pauseTimer(localStorage.key(i));
+	}
+}
+
+function stopTimer(key) {
+
+}
+
+function doneTimer(key) {
+	alert("Done with " + key + "!");
+	finishDaily(key);
+}
+
+function compareDates(date1, date2) {
+	if (date1.getFullYear() < date2.getFullYear()) {
+		return -1;
+	} else if (date1.getFullYear() == date2.getFullYear()) {
+		if (date1.getMonth() < date2.getMonth()) {
+			return -1;
+		} else if (date1.getMonth() == date2.getMonth()) {
+			if (date1.getDay() < date2.getDay()) {
+				return -1;
+			} else if (date1.getDate() == date2.getDate()) {
+				return 0;
+			} else {
+				return 1
+			}
+		} else {
+			return 1;
+		}
+	} else {
+		return 1;
+	}
 }

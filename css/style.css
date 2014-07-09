@@ -55,3 +55,10 @@ a {
  	color: #555;
  	border: 1px solid #CCC!important;
  }*/
+ 
+.form-control[disabled], 
+#hours-input-label.text-muted, 
+#minutes-input-label.text-muted,
+.btn-default[disabled]   {
+ 	visibility: hidden;
+ }
