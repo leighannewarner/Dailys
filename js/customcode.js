@@ -792,7 +792,6 @@ function refreshList() {
 			//A copy of the task would be made. This task would be a one time task.
 			
 			//daily
-			console.log (current["lastCompleted"] + " / " + today);
 			if ((current["repeatInput"] == "Daily") && (current["lastCompleted"] != null) && lastCompleted < today) {
 				
 				if (current["repeatTypeInput"] == "Normally") {
@@ -900,7 +899,6 @@ function refreshList() {
 			}*/
 			
 			if (startDate <= today) {
-				console.log("Printing " + currentKey + " " + current["descriptionInput"]);
 				$("#list .carousel-inner").html(newListItem(current, currentKey));
 				tasks = true;
 			} 
@@ -955,7 +953,7 @@ function newListItem(current, currentKey) {
 		
 		returnMe +=	'<h1>' + current["descriptionInput"] + '</h1>' +
 				  '<h2 class="timer-text">' + timerText + '</h2>' +
-				  '<h2 class="done-text"> Done! </h2>' +
+				  '<h2 class="done-text text-success"> Done! </h2>' +
 				  '<h2>Repeats ' + current["repeatInput"] + '. </h2>' +
 
 				  '<br/><div class="form-group not-done">' +
@@ -989,7 +987,7 @@ function newListItem(current, currentKey) {
 		
 			returnMe +=	'<h1>' + current["descriptionInput"] + '</h1>' +
 					  '<h2 class="timer-text">' + timerText + '</h2>' +
-				 	  '<h2 class="done-text"> Done! </h2>' +
+				 	  '<h2 class="done-text text-success"> Done! </h2>' +
 					  '<h2>Repeats ' + current["repeatInput"] + '. </h2>' +
 
 					  '<br/><div class="form-group not-done">' +
@@ -1048,7 +1046,7 @@ function startTimer(key) {
 	$("#" + key + " .pause").removeClass("hidden");
 	$("#" + key + " .pause .glyphicon").removeClass("hidden");
 	
-	 timerList[key] = setInterval(function() { decrementTimer(key); }, 600);
+	 timerList[key] = setInterval(function() { decrementTimer(key); }, 60000);
 }
 
 function pauseTimer(key) {
