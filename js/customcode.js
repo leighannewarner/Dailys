@@ -1,7 +1,8 @@
 var timerList = {};
 
 $( document ).ready(function() {
-
+	console.log(localStorage.length);
+	
 	$("h1.glyphicon").tooltip()
 	$("h2.glyphicon").tooltip()
 
@@ -765,7 +766,7 @@ function refreshList() {
 			current = JSON.parse(localStorage.getItem(currentKey));
 
 			today = new Date();
-			today.setHours(0);
+			today.setHours(2);
 			today.setMinutes(0);
 			today.setSeconds(0);
 			today.setMilliseconds(0);
@@ -781,7 +782,7 @@ function refreshList() {
 			
 			//Remove finished tasks
 			if (current["lastCompleted"] != null  && (current["repeatType"] == "Never" || (current["dateEndToggle"] && (today > endDate)))) {
-				localStorage.removeItem("daily" + i);
+				localStorage.removeItem(currentKey);
 				break;
 			}
 
@@ -796,16 +797,16 @@ function refreshList() {
 				
 				if (current["repeatTypeInput"] == "Normally") {
 					current["lastCompleted"] = null;
-					localStorage["daily" + i] = JSON.stringify(current);
+					localStorage[currentKey] = JSON.stringify(current);
 				} else {
 					//duplicate task for each day last completed to yesterday
 					current["lastCompleted"] = null;
-					localStorage["daily" + i] = JSON.stringify(current);
+					localStorage[currentKey] = JSON.stringify(current);
 				}
 			}
 			
 			//weekly
-			switch (today.getDate()) {
+			switch (today.getDay()) {
 				case 0:
 					weekday = "sunday";
 					break;
@@ -824,7 +825,7 @@ function refreshList() {
 				case 5:
 					weekday = "friday";
 					break;
-				case 6:
+				default:
 					weekday = "saturday";
 					break;
 			} 
@@ -922,20 +923,43 @@ function refreshList() {
 		$("#list").html("<div class='well well-lg text-center'><h2>You're all done for today!</h2>")
 	}
 	
-	$("#list .carousel h4.glyphicon").tooltip();
+	$("#list .carousel h4.glyphminutesicon").tooltip();
 	$("#list .carousel h2.glyphicon").tooltip();
 	$("#list .carousel button").tooltip();
 }
 
 function newListItem(current, currentKey) {
 	timerText = "";
+	
 	if (current["timedToggle"]) {
-		if (current["hoursInput"] != "" && current["minutesInput"] != "") {
-			timerText =  "<span class='hourText'> <span class='hourCount'>" + current["hoursInput"] + "</span> hour(s) and</span> <span class='minuteText'> <span class='minuteCount'>" + current["minutesInput"] + "</span> minute(s)</span> remaining!";
-		} else if (current["hoursInput"] != "" && current["minutesInput"] == "") {
-			 timerText = "<span class='hourText'> <span class='hourCount'>" + current["hoursInput"] + "</span> hour(s) and</span> <span class='minuteText'> <span class='minuteCount'>0</span> minute(s)</span> remaining!";
-		} else if (current["hoursInput"] == "" && current["minutesInput"] != "") {
-			 timerText = "<span class='hourText'> <span class='hourCount'>0</span> hour(s) and</span> <span class='minuteText'> <span class='minuteCount'>" + current["minutesInput"] + "</span> minute(s)</span> remaining!";
+		
+		hours = current["hoursInput"];
+		if (current["hoursInput"] == "" ) {
+			hours = 0;
+		}
+		
+		minutes = current["minutesInput"];
+		if (current["minutesInput"] == "" ) {
+			minutes = 0;
+		}
+		
+		if (hours != 0) {
+			if (hours == 1 && minutes == 1) {
+				timerText =  "<span class='hourCount'>" + hours + "</span> <span class='hourText'> hour and</span> <span class='minuteCount'>" + minutes + "</span> <span class='minuteText'> minute</span> remaining!";
+			} else if (hours == 1 && minutes != 1) {
+				timerText =  "<span class='hourCount'>" + hours + "</span> <span class='hourText'> hour and</span> <span class='minuteCount'>" + minutes + "</span> <span class='minuteText'> minutes</span> remaining!";
+			} else if (minutes == 1) {
+				timerText =  "<span class='hourCount'>" + hours + "</span> <span class='hourText'> hours and</span> <span class='minuteCount'>" + minutes + "</span> <span class='minuteText'> minute</span> remaining!";
+			} else {
+				timerText =  "<span class='hourCount'>" + hours + "</span> <span class='hourText'> hours and</span> <span class='minuteCount'>" + minutes + "</span> <span class='minuteText'> minutes</span> remaining!";
+			}
+		} else {
+			if (minutes != 1) {
+				timerText =  "<span class='hourCount hidden'>" + hours + "</span> <span class='hourText hidden'> hours and</span> <span class='minuteCount'>" + minutes + "</span> <span class='minuteText'> minutes</span> remaining!";
+			} else {
+				timerText =  "<span class='hourCount hidden'>" + hours + "</span> <span class='hourText hidden'> hours and</span> <span class='minuteCount'>" + minutes + "</span> <span class='minuteText'> minute</span> remaining!";
+			}
+			
 		}
 	}
 
@@ -1015,7 +1039,7 @@ function newListItem(current, currentKey) {
 function finishDaily(key) {
 	current = JSON.parse(localStorage[key]);
 	today = new Date();
-	today.setHours(0);
+	today.setHours(2);
 	today.setMinutes(0);
 	today.setSeconds(0);
 	today.setMilliseconds(0);
@@ -1086,6 +1110,12 @@ function stopTimer(key) {
 }
 
 function decrementTimer(key) {
+	/*if (parseInt($("#" + key + " .minuteCount").html()) == 0 && parseInt($("#" + key + " .hourCount").html()) >= 1) {
+		$("#" + key + " .hourText").html("hour and");
+	} else {
+		$("#" + key + " .minuteCount").html(parseInt($("#" + key + " .minuteCount").html()-1));
+	}*/
+	
 	if (parseInt($("#" + key + " .minuteCount").html()) == 0 && parseInt($("#" + key + " .hourCount").html()) >= 1) {
 		$("#" + key + " .minuteCount").html(59);
 		$("#" + key + " .hourCount").html(parseInt($("#" + key + " .hourCount").html()-1));
@@ -1093,7 +1123,7 @@ function decrementTimer(key) {
 		$("#" + key + " .minuteCount").html(parseInt($("#" + key + " .minuteCount").html()-1));
 	}
 	
-	if (parseInt($("#" + key + " .minuteCount").html()) == 0 && parseInt($("#" + key + " .hourCount").html()) == 0) {
+	if (parseInt($("#" + key + " .minuteCount").html()) <= 0) {
 		console.log("Done with timer " + key);
 		doneTimer(key);
 	}
