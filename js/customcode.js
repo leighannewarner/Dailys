@@ -454,7 +454,7 @@ $("#timed-toggle").click( function() {
 });
 
 $("#weekly-input .btn").click( function() {
-	validateWeeklyInput();
+	validateWeeklyInput(this);
 	changeButtonColor();
 });
 
@@ -628,29 +628,23 @@ function validateStartDateInput() {
 	return 2;
 }
 
-function validateWeeklyInput() {
+function validateWeeklyInput(btn) {
 	$("#weekly-input").closest(".form-group").removeClass("has-success");
 	$("#weekly-input").closest(".form-group").removeClass("has-warning");
 	$("#weekly-input").closest(".form-group").removeClass("has-error");
 	
-	if ( $("#repeat-input").val() == "Weekly" 
-	  && !($("#monday-toggle").hasClass("active")) 
-      && !($("#tuesday-toggle").hasClass("active"))
-      && !($("#wednesday-toggle").hasClass("active"))
-      && !($("#thursday-toggle").hasClass("active")) 
-      && !($("#friday-toggle").hasClass("active")) 
-      && !($("#saturday-toggle").hasClass("active")) 
-      && !($("#sunday-toggle").hasClass("active")) ) {
+	// Checks for 1) the number of elements currently active/inactive
+	// and 2) what the clicked button is getting switched to
+	// Must be done this way because JQuery's method to add the active
+	// class is getting called after this one, resulting in a weird bug
+	// where the error classes would get updated based on the pre-click
+	// state
+	if (  ($("#weekly-input .active").length == 1)
+      	  && ($(btn).hasClass("active")) ) {
 		$("#weekly-input").closest(".form-group").addClass("has-error");
 		return 2;
-	} else if ( $("#repeat-input").val() == "Weekly" 
-	  && $("#monday-toggle").hasClass("active") 
-      && $("#tuesday-toggle").hasClass("active") 
-      && $("#wednesday-toggle").hasClass("active") 
-      && $("#thursday-toggle").hasClass("active") 
-      && $("#friday-toggle").hasClass("active") 
-      && $("#saturday-toggle").hasClass("active") 
-      && $("#sunday-toggle").hasClass("active") ) {
+	} else if (  $("#weekly-input .active").length == 6 
+				 && !($(btn).hasClass("active")) ) {
 		$("#weekly-input").closest(".form-group").addClass("has-warning");
 		return 1;
 	} else {
@@ -963,7 +957,7 @@ function newListItem(current, currentKey) {
 		}
 	}
 
-	if (!tasks) {
+	if ($("#list .carousel-inner").html() == "") {
 		returnMe = '<div class="item active" id="' + currentKey + '" data-key="' + currentKey + '">' +
 				
 					'<h4 class="glyphicon glyphicon-edit"  data-toggle="tooltip" data-placement="bottom" data-container="false" title="Edit."></h4>&nbsp;' +		
