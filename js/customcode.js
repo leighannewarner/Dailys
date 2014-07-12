@@ -328,7 +328,7 @@ function errorAttention() {
 }
 
 function addTask() {
-	
+		
 	//Create JSON object containing all info
 	var newDaily = { "descriptionInput":$("#description-input").val(),
 			"repeatInput":$("#repeat-input").val(),
@@ -358,18 +358,15 @@ function addTask() {
 			 "lastCompleted":null }
 	
 	//Add to local storage
-	if (localStorage.getItem("daily" + localStorage.length) === null) {	
-		localStorage["daily" + localStorage.length]= JSON.stringify(newDaily);
-	} else {
-		var counter = 0;
-		while (localStorage.getItem("daily" + counter) === null) {
-			localStorage["daily" + counter] = JSON.stringify(newDaily);
-			counter += 1;
-		}
+	var counter = 0;
+	console.log(localStorage[0]);
+	while (localStorage.getItem("daily" + counter) !== null) {
+		counter += 1;
 	}
 	
+	localStorage["daily" + counter] = JSON.stringify(newDaily);
 	
-	refreshList();
+	newListItem(newDaily, "daily" + counter);
 }
 
 /* Data validation */
@@ -642,7 +639,7 @@ function validateWeeklyInput(btn) {
 	if (  ($("#weekly-input .active").length == 1)
       	  && ($(btn).hasClass("active")) ) {
 		$("#weekly-input").closest(".form-group").addClass("has-error");
-		return 2;
+		return 0;
 	} else if (  $("#weekly-input .active").length == 6 
 				 && !($(btn).hasClass("active")) ) {
 		$("#weekly-input").closest(".form-group").addClass("has-warning");
@@ -824,7 +821,11 @@ function refreshList() {
 					break;
 			} 
 			
+			
+			//The logic for all but dailys is kind of borked. Events only reset if the page is visited on that day.
+			//Should loop through and check all dates in between last completed and today for reset potential
 			if (current["repeatInput"] == "Weekly" && current["lastCompleted"] != null && lastCompleted < today && current["weeklyToggles"][0][weekday]) {
+			
 				if (current["repeatTypeInput"] == "Normally" ) {
 					current["lastCompleted"] = null;
 					localStorage[currentKey] = JSON.stringify(current);
@@ -894,19 +895,10 @@ function refreshList() {
 			}*/
 			
 			if (startDate <= today) {
-				$("#list .carousel-inner").html(newListItem(current, currentKey));
+				newListItem(current, currentKey);
 				tasks = true;
 			} 
 			
-			if (current["lastCompleted"] != null) {
-				$("#" + currentKey).removeClass("not-completed");
-				$("#" + currentKey).removeClass("completed");
-				$("#" + currentKey).addClass("completed");
-			} else {
-				$("#" + currentKey).removeClass("completed");
-				$("#" + currentKey).removeClass(" not-completed");
-				$("#" + currentKey).addClass("not-completed");
-			}
 		}	
 	} else {
 		//No carousel needed, just show a simple message
@@ -1026,7 +1018,19 @@ function newListItem(current, currentKey) {
 				  '</div>' +
 					'</div>';
 	}
-		
+	
+	$("#list .carousel-inner").html(returnMe);	
+	
+	if (current["lastCompleted"] != null) {
+		$("#" + currentKey).removeClass("not-completed");
+		$("#" + currentKey).removeClass("completed");
+		$("#" + currentKey).addClass("completed");
+	} else {
+		$("#" + currentKey).removeClass("completed");
+		$("#" + currentKey).removeClass(" not-completed");
+		$("#" + currentKey).addClass("not-completed");
+	}
+	
 	return returnMe;
 }
 
@@ -1039,19 +1043,31 @@ function finishDaily(key) {
 	today.setMilliseconds(0);
 	current["lastCompleted"] = today;
 	localStorage[key] = JSON.stringify(current);
-	refreshList();
+	
+	$("#" + key).removeClass("not-completed");
+	$("#" + key).removeClass("completed");
+	$("#" + key).addClass("completed");
+	
 }
 
 function unfinishDaily(key) {
 	current = JSON.parse(localStorage[key]);
 	current["lastCompleted"] = null;
 	localStorage[key] = JSON.stringify(current);
-	refreshList();
+	
+	$("#" + key).removeClass("completed");
+	$("#" + key).removeClass("not-completed");
+	$("#" + key).addClass("not-completed");
 }
 
 function deleteDaily(key) {
 	localStorage.removeItem(key);
-	refreshList();
+	
+	$(".carousel").carousel("next");
+	
+	setTimeout(function () {
+				$("#" + key ).remove();
+   			 }, 600);
 }
 
 function startTimer(key) {
