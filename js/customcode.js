@@ -781,7 +781,7 @@ function refreshList() {
 			}
 			
 			//Remove finished tasks
-			if (current["lastCompleted"] != null  && (current["repeatType"] == "Never" || (current["dateEndToggle"] && (today > endDate)))) {
+			if ( current["lastCompleted"] != null  && ( current["repeatInput"] == "Never" || (current["dateEndToggle"] && (today > endDate)) ) ) {
 				localStorage.removeItem(currentKey);
 				break;
 			}
@@ -833,11 +833,11 @@ function refreshList() {
 			if (current["repeatInput"] == "Weekly" && current["lastCompleted"] != null && lastCompleted < today && current["weeklyToggles"][0][weekday]) {
 				if (current["repeatTypeInput"] == "Normally" ) {
 					current["lastCompleted"] = null;
-					localStorage[key] = JSON.stringify(current);
+					localStorage[currentKey] = JSON.stringify(current);
 				} else {
 					//duplicate task for every week from last completed to yesterday
 					current["lastCompleted"] = null;
-					localStorage[key] = JSON.stringify(current);
+					localStorage[currentKey] = JSON.stringify(current);
 				}
 			}
 			
@@ -845,11 +845,11 @@ function refreshList() {
 			if (current["repeatInput"] == "Monthly" && current["lastCompleted"] != null && lastCompleted < today && today.getDate() == startDate.getDate()) {
 				if (current["repeatTypeInput"] == "Normally" ) {
 					current["lastCompleted"] = null;
-					localStorage[key] = JSON.stringify(current);
+					localStorage[currentKey] = JSON.stringify(current);
 				} else {
 					//duplicate task for every repeated month from last completed to yesterday
 					current["lastCompleted"] = null;
-					localStorage[key] = JSON.stringify(current);
+					localStorage[currentKey] = JSON.stringify(current);
 				}
 			}
 			
@@ -857,11 +857,11 @@ function refreshList() {
 			if (current["repeatInput"] == "Yearly" && current["lastCompleted"] != null && lastCompleted < today &&  (today.getDate() == startDate.getDate() &&  today.getMonth() == startMonth.getMonth())) {
 				if (normally) {
 					current["lastCompleted"] = null;
-					localStorage[key] = JSON.stringify(current);
+					localStorage[currentKey] = JSON.stringify(current);
 				} else {
 					//duplicate task for every year from last completed to yesterday
 					current["lastCompleted"] = null;
-					localStorage[key] = JSON.stringify(current);
+					localStorage[currentKey] = JSON.stringify(current);
 				}
 			}
 			
