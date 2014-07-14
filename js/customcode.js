@@ -757,7 +757,6 @@ function refreshList() {
 			current = JSON.parse(localStorage.getItem(currentKey));
 
 			today = new Date();
-			today.setHours(2);
 			today.setMinutes(0);
 			today.setSeconds(0);
 			today.setMilliseconds(0);

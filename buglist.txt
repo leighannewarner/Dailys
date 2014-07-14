@@ -1,0 +1,15 @@
+==== TO DO ==============================================================================
+---- HIGH PRIORITY      -----------------------------------------------------------------
+   - Fix reset logic
+---- MED  PRIORITY   --------------------------------------------------------------------
+   - Edit task page
+   - The ability to postpone a task or remove an incarnation of a repeating task.
+   - Refresh list button.
+   - Custom interval
+---- LOW  PRIORITY  ---------------------------------------------------------------------
+   - Adjustable reset time.
+   - Persistant timer - won't reset when the list is refreshed.
+   - The ability to color code your list items.
+   - Accounts so your list can be synced across devices.
+   - Favicon
+=========================================================================================
