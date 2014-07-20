@@ -1,13 +1,17 @@
+//Sets up an empty global list for the timers
+//When a timer is started it is added to this list
 var timerList = {};
 
+//Set up the web app
 $( document ).ready(function() {
-	console.log(localStorage.length);
-	
+	//Enables the tooltips
 	$("h1.glyphicon").tooltip()
 	$("h2.glyphicon").tooltip()
 
+	//Sets the date selectors to today
 	adjustDateSelectors();
 	
+	//Hides and shows the elements in the add form
 	checkIntervalInput();
 	checkWeeklyInput();
 	checkDateInput();
@@ -15,6 +19,7 @@ $( document ).ready(function() {
 	checkDateToggle();
 	checkTimedToggle();
 	
+	//Displays current todo list item
 	refreshList();
 });
 
@@ -795,43 +800,106 @@ function refreshList() {
 				}
 			}
 			
-			//weekly
-			switch (today.getDay()) {
-				case 0:
-					weekday = "sunday";
-					break;
-				case 1:
-					weekday = "monday";
-					break;
-				case 2:
-					weekday = "tuesday";
-					break;
-				case 3:
-					weekday = "wednesday";
-					break;
-				case 4:
-					weekday = "thursday";
-					break;
-				case 5:
-					weekday = "friday";
-					break;
-				default:
-					weekday = "saturday";
-					break;
-			} 
-			
-			
 			//The logic for all but dailys is kind of borked. Events only reset if the page is visited on that day.
-			//Should loop through and check all dates in between last completed and today for reset potential
-			if (current["repeatInput"] == "Weekly" && current["lastCompleted"] != null && lastCompleted < today && current["weeklyToggles"][0][weekday]) {
+			//Should loop through and check all dates in between last completed and today for reset potential?
+	
+			//weekly
+			if (current["repeatInput"] == "Weekly" && current["lastCompleted"] != null && lastCompleted < today) {
+				switch (today.getDay()) {
+					case 0:
+						weekday = "sunday";
+						break;
+					case 1:
+						weekday = "monday";
+						break;
+					case 2:
+						weekday = "tuesday";
+						break;
+					case 3:
+						weekday = "wednesday";
+						break;
+					case 4:
+						weekday = "thursday";
+						break;
+					case 5:
+						weekday = "friday";
+						break;
+					default:
+						weekday = "saturday";
+						break;
+				} 
 			
-				if (current["repeatTypeInput"] == "Normally" ) {
-					current["lastCompleted"] = null;
-					localStorage[currentKey] = JSON.stringify(current);
-				} else {
-					//duplicate task for every week from last completed to yesterday
-					current["lastCompleted"] = null;
-					localStorage[currentKey] = JSON.stringify(current);
+				// Checking to see if today is after the task should reset.
+				// Needs to handle multiple weekday repeats
+				nextIteration = lastCompleted;
+
+				switch (nextIteration.getDay()) {
+					case 0:
+						niweekday = "sunday";
+						break;
+					case 1:
+						niweekday = "monday";
+						break;
+					case 2:
+						niweekday = "tuesday";
+						break;
+					case 3:
+						niweekday = "wednesday";
+						break;
+					case 4:
+						niweekday = "thursday";
+						break;
+					case 5:
+						niweekday = "friday";
+						break;
+					default:
+						niweekday = "saturday";
+						break;
+				} 
+			
+				while (!current["weeklyToggles"][0][niweekday]) {				
+					switch (nextIteration.getDay()) {
+						case 0:
+							niweekday = "sunday";
+							break;
+						case 1:
+							niweekday = "monday";
+							break;
+						case 2:
+							niweekday = "tuesday";
+							break;
+						case 3:
+							niweekday = "wednesday";
+							break;
+						case 4:
+							niweekday = "thursday";
+							break;
+						case 5:
+							niweekday = "friday";
+							break;
+						default:
+							niweekday = "saturday";
+							break;
+					} 
+					
+					nextIteration.setDate(nextIteration.getDate()-1);
+					console.log(nextIteration);
+
+				}
+			
+				nextIteration.setDate(nextIteration.getDate()+7);			
+				console.log(nextIteration);
+			
+				if (today > nextIteration) {
+				
+					if (current["repeatTypeInput"] == "Normally" ) {
+						current["lastCompleted"] = null;
+						localStorage[currentKey] = JSON.stringify(current);
+					} else {
+						//duplicate task for every week from last completed to yesterday
+						current["lastCompleted"] = null;
+						localStorage[currentKey] = JSON.stringify(current);
+					}
 				}
 			}
 			
