@@ -1,0 +1,31 @@
+/*
+ * Base Blue: #03a9f4
+ */
+
+html, body {
+    height: 100%;
+    margin: 0;
+    background-color: #E5E5E5;
+    font-family: 'RobotoDraft', sans-serif;
+}
+
+paper-tabs {
+  	background-color: #222;
+  	color: #fff;
+}
+
+paper-tabs::shadow #selectionBar {
+	background-color: #03a9f4;
+}
+
+paper-tab::shadow #ink {
+	color: #03a9f4;
+}
+
+#add-item-menu {
+	background: white;
+}
+
+#list {
+	background: white;
+}
